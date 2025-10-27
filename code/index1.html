@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartHarvest - Smart Crop Prediction</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .hero-bg {
+            background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1560493676-04071c5f467b?q=80&w=1974&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+        }
+        .hero-bg h1 {
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-green-700 to-emerald-800 text-white shadow-lg sticky top-0 z-10">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-3xl font-extrabold tracking-wider">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-9 w-9 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                SmartHarvest
+            </div>
+            <nav class="hidden md:flex space-x-8 font-semibold">
+                <a href="#" class="hover:text-green-300 transition">Home</a>
+                <a href="#" class="hover:text-green-300 transition">About</a>
+                <a href="#" class="hover:text-green-300 transition">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-bg text-white">
+        <div class="container mx-auto px-6 py-28 text-center">
+            <h1 class="text-4xl md:text-6xl font-extrabold mb-4">Cultivate a Smarter Future</h1>
+            <p class="text-lg md:text-xl text-gray-200 mb-8 max-w-3xl mx-auto">Leverage predictive analytics to choose the most profitable crops for your land and season.</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-12 -mt-20">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-4xl mx-auto backdrop-blur-sm bg-opacity-95">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-2">Recommendation Engine</h2>
+            <p class="text-center text-gray-500 mb-8">Select your region and planting month to get an instant prediction.</p>
+            
+            <!-- Input Form -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div>
+                    <label for="timeOfYear" class="block text-sm font-medium text-gray-700 mb-2">Time of Year (Planting Season)</label>
+                    <select id="timeOfYear" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition shadow-sm">
+                        <option value="January">January</option>
+                        <option value="February">February</option>
+                        <option value="March">March</option>
+                        <option value="April">April</option>
+                        <option value="May">May</option>
+                        <option value="June">June</option>
+                        <option value="July">July</option>
+                        <option value="August">August</option>
+                        <option value="September">September</option>
+                        <option value="October">October</option>
+                        <option value="November">November</option>
+                        <option value="December">December</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="region" class="block text-sm font-medium text-gray-700 mb-2">Region</label>
+                    <select id="region" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition shadow-sm">
+                        <option value="Northern Plains">Northern Plains</option>
+                        <option value="Southern Plateau">Southern Plateau</option>
+                        <option value="Coastal Areas">Coastal Areas</option>
+                        <option value="Himalayan Region">Himalayan Region</option>
+                        <option value="Desert Region">Desert Region</option>
+                    </select>
+                </div>
+            </div>
+            <div class="text-center">
+                <button id="predictBtn" class="bg-gradient-to-r from-emerald-500 to-green-600 text-white font-bold py-3 px-10 rounded-lg hover:from-emerald-600 hover:to-green-700 transition-all transform hover:scale-105 shadow-xl hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-green-300">
+                    Predict Best Crop
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results" class="hidden opacity-0 mt-12 max-w-5xl mx-auto">
+            <div class="bg-white p-8 rounded-2xl shadow-2xl">
+                <h3 class="text-3xl font-bold text-center text-gray-800 mb-8">Prediction Results</h3>
+                <div class="grid md:grid-cols-5 gap-8 items-center">
+                    <!-- Image Section -->
+                    <div class="md:col-span-2">
+                        <img id="cropImage" src="https://placehold.co/600x600/e2e8f0/e2e8f0" alt="Recommended Crop" class="rounded-2xl shadow-lg w-full h-auto object-cover aspect-square">
+                    </div>
+                    <!-- Crop Details -->
+                    <div class="md:col-span-3 text-center md:text-left">
+                        <p class="text-sm text-gray-500">For <span id="resultRegion" class="font-semibold"></span> in <span id="resultMonth" class="font-semibold"></span></p>
+                        <h4 class="text-5xl font-extrabold text-green-700 my-2" id="cropName"></h4>
+                        <p class="text-gray-600 mb-6" id="cropDescription"></p>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-center md:justify-start bg-green-50 p-3 rounded-lg ring-1 ring-green-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                                <span class="font-semibold">Predicted Profitability:</span>
+                                <span class="ml-2 font-bold text-green-600" id="profitability"></span>
+                            </div>
+                            <div class="flex items-center justify-center md:justify-start bg-blue-50 p-3 rounded-lg ring-1 ring-blue-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                <span class="font-semibold">Confidence Level:</span>
+                                <span class="ml-2 font-bold text-blue-600" id="confidence"></span>
+                            </div>
+                            <div class="flex items-center justify-center md:justify-start bg-yellow-50 p-3 rounded-lg ring-1 ring-yellow-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+                                </svg>
+                                <span class="font-semibold">Predicted Yield:</span>
+                                <span class="ml-2 font-bold text-yellow-600" id="predictedYield"></span>
+                            </div>
+                            <div class="flex items-center justify-center md:justify-start bg-purple-50 p-3 rounded-lg ring-1 ring-purple-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 8h6m-5 0a3 3 0 110 6H9l-1 1-1-1H6a3 3 0 010-6h3zm5 0a3 3 0 110 6h3l1 1 1-1h1a3 3 0 110-6h-3z" />
+                                </svg>
+                                <span class="font-semibold">Predicted Profit:</span>
+                                <span class="ml-2 font-bold text-purple-600" id="predictedProfit"></span>
+                            </div>
+                        </div>
+                        <!-- Products Section -->
+                        <div class="mt-8">
+                            <h5 class="font-semibold text-center md:text-left text-gray-700 mb-3">Potential Products</h5>
+                            <div id="cropProducts" class="flex flex-wrap gap-2 justify-center md:justify-start">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Chart Section -->
+                <div class="mt-10">
+                    <canvas id="yieldChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Loading Spinner -->
+        <div id="loading" class="hidden text-center mt-8">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-4 border-green-600"></div>
+            <p class="mt-4 text-gray-600 font-semibold">Analyzing historical data and running predictions...</p>
+        </div>
+
+    </main>
+
+    <script>
+        // --- Mock Data Store with Image URLs---
+        const cropData = {
+            "Northern Plains": {
+                "January": { name: "Wheat", description: "A staple crop, well-suited for the cool, dry winters of the Northern Plains.", profitability: "High", confidence: "95%", products: ["Flour (Atta)", "Bread", "Pasta", "Semolina (Suji)", "Biscuits"], baseYield: 45, pricePerQuintal: 2100, imageUrl: 'https://images.unsplash.com/photo-1542675887-2514a6374026?q=80&w=800&auto=format&fit=crop' },
+                "February": { name: "Mustard", description: "An oilseed crop that thrives in the winter season and has a strong market demand.", profitability: "High", confidence: "93%", products: ["Mustard Oil", "Spices", "Sauces", "Animal Feed"], baseYield: 25, pricePerQuintal: 5400, imageUrl: 'https://images.unsplash.com/photo-1596201385933-1c3a9f7eda20?q=80&w=800&auto=format&fit=crop' },
+                "March": { name: "Barley", description: "A drought-tolerant grain perfect for planting as winter recedes.", profitability: "Medium", confidence: "88%", products: ["Malt for Beer", "Animal Fodder", "Flour", "Soups"], baseYield: 30, pricePerQuintal: 1600, imageUrl: 'https://images.unsplash.com/photo-1596198185842-7052a5ab3418?q=80&w=800&auto=format&fit=crop' },
+                "April": { name: "Sugarcane", description: "A water-intensive cash crop planted before the peak of summer.", profitability: "Very High", confidence: "91%", products: ["Sugar", "Jaggery", "Ethanol", "Molasses", "Paper"], baseYield: 700, pricePerQuintal: 350, imageUrl: 'https://images.unsplash.com/photo-1587845330872-951631fee4f1?q=80&w=800&auto=format&fit=crop' },
+                "June": { name: "Rice", description: "Requires significant water, ideal for the monsoon season in this region.", profitability: "Very High", confidence: "96%", products: ["Polished Rice", "Rice Bran Oil", "Puffed Rice", "Rice Flour"], baseYield: 60, pricePerQuintal: 2000, imageUrl: 'https://images.unsplash.com/photo-1536304993881-ff6e9eefa2a7?q=80&w=800&auto=format&fit=crop' },
+                "July": { name: "Maize", description: "A versatile crop that grows quickly during the rainy season.", profitability: "High", confidence: "94%", products: ["Corn Flour", "Popcorn", "Animal Feed", "Corn Syrup", "Ethanol"], baseYield: 55, pricePerQuintal: 1900, imageUrl: 'https://images.unsplash.com/photo-1598231221943-1162d98f394a?q=80&w=800&auto=format&fit=crop' },
+                "October": { name: "Potato", description: "A cash crop that prefers the cooler temperatures starting in October.", profitability: "High", confidence: "92%", products: ["Wafers/Chips", "Starch", "Vodka", "Frozen Foods"], baseYield: 250, pricePerQuintal: 1200, imageUrl: 'https://images.unsplash.com/photo-1590165482129-1b8b21703d64?q=80&w=800&auto=format&fit=crop' },
+                "November": { name: "Peas", description: "A cool-season legume crop that also enriches the soil with nitrogen.", profitability: "Medium", confidence: "89%", products: ["Frozen Peas", "Canned Peas", "Soups", "Snacks"], baseYield: 40, pricePerQuintal: 3000, imageUrl: 'https://images.unsplash.com/photo-1551022372-0bdac8082823?q=80&w=800&auto=format&fit=crop' },
+                "default": { name: "Sorghum", description: "A hardy, drought-resistant crop suitable for off-seasons.", profitability: "Medium", confidence: "85%", products: ["Flour (Jowar Atta)", "Animal Fodder", "Biofuel", "Syrup"], baseYield: 35, pricePerQuintal: 2700, imageUrl: 'https://images.unsplash.com/photo-1627522502819-a09c258f3df1?q=80&w=800&auto=format&fit=crop' }
+            },
+            "Southern Plateau": {
+                "May": { name: "Maize", description: "Planted before monsoon, it's a key crop for food and feed in the plateau.", profitability: "High", confidence: "92%", products: ["Corn Flour", "Popcorn", "Animal Feed", "Corn Syrup"], baseYield: 50, pricePerQuintal: 1900, imageUrl: 'https://images.unsplash.com/photo-1598231221943-1162d98f394a?q=80&w=800&auto=format&fit=crop' },
+                "June": { name: "Cotton", description: "Thrives in the hot and humid conditions of the southern monsoon.", profitability: "Very High", confidence: "94%", products: ["Textiles & Clothing", "Cottonseed Oil", "Animal Feed", "Medical Supplies"], baseYield: 15, pricePerQuintal: 6000, imageUrl: 'https://images.unsplash.com/photo-1593954286589-70438243329f?q=80&w=800&auto=format&fit=crop' },
+                "July": { name: "Jowar (Sorghum)", description: "A staple cereal crop, highly resistant to drought conditions in the plateau.", profitability: "High", confidence: "95%", products: ["Flour (Jowar Atta)", "Animal Fodder", "Biofuel", "Syrup"], baseYield: 40, pricePerQuintal: 2700, imageUrl: 'https://images.unsplash.com/photo-1627522502819-a09c258f3df1?q=80&w=800&auto=format&fit=crop' },
+                "August": { name: "Sunflower", description: "A popular oilseed crop that performs well in the plateau's climate.", profitability: "High", confidence: "90%", products: ["Sunflower Oil", "Snack Seeds", "Bird Feed", "Animal Meal"], baseYield: 20, pricePerQuintal: 6400, imageUrl: 'https://images.unsplash.com/photo-1596708234394-1a221f008316?q=80&w=800&auto=format&fit=crop' },
+                "October": { name: "Ragi (Finger Millet)", description: "A nutritious millet that grows well in arid conditions post-monsoon.", profitability: "High", confidence: "91%", products: ["Ragi Flour", "Malt", "Porridge Mixes", "Baked Goods"], baseYield: 22, pricePerQuintal: 3500, imageUrl: 'https://images.unsplash.com/photo-1627522502819-a09c258f3df1?q=80&w=800&auto=format&fit=crop' },
+                "November": { name: "Groundnut", description: "An oilseed crop that is well-suited for the post-monsoon season.", profitability: "High", confidence: "90%", products: ["Peanut Oil", "Peanut Butter", "Snacks", "Animal Feed"], baseYield: 25, pricePerQuintal: 5800, imageUrl: 'https://images.unsplash.com/photo-1579367503434-56b48530395a?q=80&w=800&auto=format&fit=crop' },
+                "default": { name: "Pulses (Tur)", description: "Various pulses are suitable for this region's climate year-round.", profitability: "Medium", confidence: "87%", products: ["Split Peas (Dal)", "Flour (Besan)", "Soups", "Snacks"], baseYield: 18, pricePerQuintal: 7000, imageUrl: 'https://images.unsplash.com/photo-1605703908874-5c9a0a0b63c7?q=80&w=800&auto=format&fit=crop' }
+            },
+            "Coastal Areas": {
+                "January": { name: "Sugarcane", description: "The humid climate is excellent for high-yield sugarcane cultivation.", profitability: "Very High", confidence: "93%", products: ["Sugar", "Jaggery", "Ethanol", "Molasses"], baseYield: 750, pricePerQuintal: 350, imageUrl: 'https://images.unsplash.com/photo-1587845330872-951631fee4f1?q=80&w=800&auto=format&fit=crop' },
+                "May": { name: "Coconut", description: "A year-round plantation crop, but May is ideal for new saplings.", profitability: "Very High", confidence: "98%", products: ["Coconut Oil", "Copra", "Dessicated Coconut", "Coir Fiber", "Coconut Water"], baseYield: 100, pricePerQuintal: 2500, imageUrl: 'https://images.unsplash.com/photo-1589556232533-313a96fd4386?q=80&w=800&auto=format&fit=crop' },
+                "June": { name: "Rice", description: "The high rainfall and humidity are perfect for paddy cultivation.", profitability: "High", confidence: "97%", products: ["Polished Rice", "Rice Bran Oil", "Puffed Rice", "Rice Flour"], baseYield: 65, pricePerQuintal: 2000, imageUrl: 'https://images.unsplash.com/photo-1536304993881-ff6e9eefa2a7?q=80&w=800&auto=format&fit=crop' },
+                "August": { name: "Turmeric", description: "A spice that grows well in the warm, humid conditions post-monsoon.", profitability: "High", confidence: "91%", products: ["Spice Powder", "Dyes", "Cosmetics", "Medicinal Products"], baseYield: 80, pricePerQuintal: 8000, imageUrl: 'https://images.unsplash.com/photo-1590319328258-4a994a5c2c7a?q=80&w=800&auto=format&fit=crop' },
+                "October": { name: "Spices", description: "Post-monsoon is the best time for planting various high-value spices like pepper.", profitability: "Very High", confidence: "95%", products: ["Whole Spices", "Spice Oils", "Seasonings", "Perfumery"], baseYield: 10, pricePerQuintal: 15000, imageUrl: 'https://images.unsplash.com/photo-1552690680-d6771742a10e?q=80&w=800&auto=format&fit=crop' },
+                "default": { name: "Cashew", description: "Well-suited to the sandy soils and tropical climate of coastal regions.", profitability: "High", confidence: "92%", products: ["Cashew Nuts", "Cashew Apple Juice (Feni)", "Cashew Nut Shell Liquid"], baseYield: 8, pricePerQuintal: 20000, imageUrl: 'https://images.unsplash.com/photo-1621532542353-2c1b7e92a2a4?q=80&w=800&auto=format&fit=crop' }
+            },
+            "Himalayan Region": {
+                "March": { name: "Cherries", description: "Early spring is ideal for cherry blossoms, leading to a summer harvest.", profitability: "Very High", confidence: "94%", products: ["Fresh Fruit", "Jams & Preserves", "Juices", "Dried Cherries"], baseYield: 50, pricePerQuintal: 6000, imageUrl: 'https://images.unsplash.com/photo-1528821128474-27f963b062bf?q=80&w=800&auto=format&fit=crop' },
+                "April": { name: "Apple", description: "The cool climate is perfect for high-quality apple orchards.", profitability: "Very High", confidence: "97%", products: ["Fresh Fruit", "Juice & Cider", "Jams", "Apple Cider Vinegar"], baseYield: 150, pricePerQuintal: 5000, imageUrl: 'https://images.unsplash.com/photo-1560806887-1e4cd0b69665?q=80&w=800&auto=format&fit=crop' },
+                "May": { name: "Maize", description: "A staple food grain for the region, planted before the summer rains.", profitability: "High", confidence: "90%", products: ["Corn Flour", "Animal Feed", "Grit"], baseYield: 45, pricePerQuintal: 1900, imageUrl: 'https://images.unsplash.com/photo-1598231221943-1162d98f394a?q=80&w=800&auto=format&fit=crop' },
+                "June": { name: "Potato", description: "Grows well in the hilly terrain and moderate summer temperatures.", profitability: "High", confidence: "92%", products: ["Fresh Tubers", "Seeds", "Chips"], baseYield: 200, pricePerQuintal: 1500, imageUrl: 'https://images.unsplash.com/photo-1590165482129-1b8b21703d64?q=80&w=800&auto=format&fit=crop' },
+                "September": { name: "Saffron", description: "An extremely high-value crop that requires a specific cool, dry climate.", profitability: "Exceptional", confidence: "96%", products: ["Spice", "Food Coloring", "Perfumery", "Medicinal Uses"], baseYield: 0.02, pricePerQuintal: 2500000, imageUrl: 'https://images.unsplash.com/photo-1599231577672-047a04945173?q=80&w=800&auto=format&fit=crop' },
+                "default": { name: "Buckwheat", description: "A short-duration crop suitable for the unique alpine conditions.", profitability: "Medium", confidence: "86%", products: ["Flour", "Noodles", "Pancakes", "Tea"], baseYield: 12, pricePerQuintal: 3000, imageUrl: 'https://images.unsplash.com/photo-1555981184-b0451a919313?q=80&w=800&auto=format&fit=crop' }
+            },
+            "Desert Region": {
+                "May": { name: "Dates", description: "Date palms are highly adapted to arid conditions and yield valuable fruit.", profitability: "High", confidence: "93%", products: ["Fresh Dates", "Dried Dates", "Date Syrup", "Vinegar"], baseYield: 80, pricePerQuintal: 4000, imageUrl: 'https://images.unsplash.com/photo-1608799443932-d8aaa11e3831?q=80&w=800&auto=format&fit=crop' },
+                "July": { name: "Bajra (Pearl Millet)", description: "Extremely drought-resistant and thrives in the arid conditions of the desert.", profitability: "High", confidence: "96%", products: ["Flour (Atta)", "Fodder", "Porridge"], baseYield: 20, pricePerQuintal: 2300, imageUrl: 'https://images.unsplash.com/photo-1627522502819-a09c258f3df1?q=80&w=800&auto=format&fit=crop' },
+                "August": { name: "Guar (Cluster Bean)", description: "A hardy legume used for both food and industrial purposes.", profitability: "Medium", confidence: "89%", products: ["Guar Gum (Industrial Thickener)", "Vegetable", "Animal Feed"], baseYield: 15, pricePerQuintal: 5500, imageUrl: 'https://images.unsplash.com/photo-1598582236899-38b00b759664?q=80&w=800&auto=format&fit=crop' },
+                "October": { name: "Cumin", description: "A spice crop that requires a cool, dry climate for good yields.", profitability: "Very High", confidence: "94%", products: ["Whole Seeds", "Ground Spice", "Essential Oil"], baseYield: 8, pricePerQuintal: 25000, imageUrl: 'https://images.unsplash.com/photo-1590319328258-4a994a5c2c7a?q=80&w=800&auto=format&fit=crop' },
+                "November": { name: "Fenugreek", description: "A leafy vegetable and spice that grows well in the cooler desert winter.", profitability: "Medium", confidence: "87%", products: ["Leaves (Vegetable)", "Seeds (Spice)", "Medicinal Supplements"], baseYield: 12, pricePerQuintal: 6000, imageUrl: 'https://images.unsplash.com/photo-1605915579388-093a2f1d9b32?q=80&w=800&auto=format&fit=crop' },
+                "default": { name: "Moth Bean", description: "One of the most drought-resistant pulses, perfect for arid zones.", profitability: "Medium", confidence: "88%", products: ["Sprouts", "Dal", "Snacks (Bhujia)"], baseYield: 10, pricePerQuintal: 7500, imageUrl: 'https://images.unsplash.com/photo-1600375822363-348508713a83?q=80&w=800&auto=format&fit=crop' }
+            },
+        };
+
+        // --- DOM Elements ---
+        const predictBtn = document.getElementById('predictBtn');
+        const timeOfYearSelect = document.getElementById('timeOfYear');
+        const regionSelect = document.getElementById('region');
+        const resultsDiv = document.getElementById('results');
+        const loadingDiv = document.getElementById('loading');
+        
+        const resultRegion = document.getElementById('resultRegion');
+        const resultMonth = document.getElementById('resultMonth');
+        const cropName = document.getElementById('cropName');
+        const cropDescription = document.getElementById('cropDescription');
+        const profitability = document.getElementById('profitability');
+        const confidence = document.getElementById('confidence');
+        const cropImage = document.getElementById('cropImage');
+        const cropProducts = document.getElementById('cropProducts');
+        const predictedYield = document.getElementById('predictedYield');
+        const predictedProfit = document.getElementById('predictedProfit');
+        
+        const chartCanvas = document.getElementById('yieldChart');
+        let yieldChart = null;
+
+        // --- Event Listener ---
+        predictBtn.addEventListener('click', () => {
+            const selectedTime = timeOfYearSelect.value;
+            const selectedRegion = regionSelect.value;
+
+            resultsDiv.classList.add('hidden', 'opacity-0');
+            resultsDiv.classList.remove('fade-in');
+            loadingDiv.classList.remove('hidden');
+
+            setTimeout(() => {
+                const prediction = getPrediction(selectedRegion, selectedTime);
+                displayResults(prediction, selectedRegion, selectedTime);
+                
+                loadingDiv.classList.add('hidden');
+                resultsDiv.classList.remove('hidden');
+                resultsDiv.classList.add('fade-in');
+                resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 1500); 
+        });
+
+        // --- Functions ---
+        function getPrediction(region, time) {
+            const regionData = cropData[region];
+            return regionData[time] || regionData["default"];
+        }
+
+        function displayResults(prediction, region, month) {
+            resultRegion.textContent = region;
+            resultMonth.textContent = month;
+            cropName.textContent = prediction.name;
+            cropDescription.textContent = prediction.description;
+            profitability.textContent = prediction.profitability;
+            confidence.textContent = prediction.confidence;
+            cropImage.src = prediction.imageUrl;
+            cropImage.alt = `Image of ${prediction.name}`;
+
+            const chartData = generateChartData(prediction.name, prediction.baseYield);
+            const latestPredictedYield = parseFloat(chartData.data[chartData.data.length - 1]);
+            const predictedProfitValue = latestPredictedYield * prediction.pricePerQuintal;
+
+            predictedYield.textContent = `${latestPredictedYield.toFixed(2)} Quintals/Acre`;
+            predictedProfit.textContent = `₹ ${Math.round(predictedProfitValue).toLocaleString('en-IN')} / Acre`;
+
+            cropProducts.innerHTML = '';
+            if (prediction.products && prediction.products.length > 0) {
+                prediction.products.forEach(product => {
+                    const productTag = document.createElement('span');
+                    productTag.className = 'bg-gray-200 text-gray-800 text-sm font-medium px-3 py-1.5 rounded-full shadow-sm';
+                    productTag.textContent = product;
+                    cropProducts.appendChild(productTag);
+                });
+            }
+
+            renderChart(chartData);
+        }
+        
+        function generateChartData(cropName, baseYield) {
+            const labels = ['2023 (Actual)', '2024 (Actual)', '2025 (Predicted)', '2026 (Predicted)', '2027 (Predicted)'];
+            const data = [
+                baseYield - (baseYield * 0.1) + (Math.random() * baseYield * 0.2),
+                baseYield - (baseYield * 0.05) + (Math.random() * baseYield * 0.1),
+                baseYield + (baseYield * 0.02) + (Math.random() * baseYield * 0.05),
+                baseYield + (baseYield * 0.04) + (Math.random() * baseYield * 0.08),
+                baseYield + (baseYield * 0.06) + (Math.random() * baseYield * 0.1),
+            ].map(d => d.toFixed(2));
+
+            return { labels, data };
+        }
+
+        function renderChart(chartData) {
+            const ctx = chartCanvas.getContext('2d');
+            
+            if (yieldChart) {
+                yieldChart.destroy();
+            }
+
+            yieldChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [{
+                        label: 'Yield (in Quintals per Acre)',
+                        data: chartData.data,
+                        backgroundColor: [
+                            'rgba(156, 163, 175, 0.6)',
+                            'rgba(156, 163, 175, 0.6)',
+                            'rgba(22, 163, 74, 0.6)',
+                            'rgba(22, 163, 74, 0.7)',
+                            'rgba(22, 163, 74, 0.8)',
+                        ],
+                        borderColor: [
+                            'rgba(156, 163, 175, 1)',
+                            'rgba(156, 163, 175, 1)',
+                            'rgba(22, 163, 74, 1)',
+                            'rgba(22, 163, 74, 1)',
+                            'rgba(22, 163, 74, 1)',
+                        ],
+                        borderWidth: 1,
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Historical & Predicted Yield Trend',
+                            font: {
+                                size: 18,
+                                weight: 'bold'
+                            },
+                            color: '#374151',
+                            padding: {
+                                bottom: 20
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Quintals / Acre',
+                                font: {
+                                    weight: 'bold'
+                                }
+                            }
+                        },
+                        x: {
+                           title: {
+                                display: true,
+                                text: 'Year',
+                                font: {
+                                    weight: 'bold'
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>
